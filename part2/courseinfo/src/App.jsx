@@ -17,11 +17,12 @@ const Content = ({ parts }) => (
 )
 
 const Total = ({ parts }) => {
-  let totalExercises = 0
-  for (const part of parts) {
-    totalExercises += part.exercises
-  }
-  return <p>Number of exercises {totalExercises}</p>
+  return (
+    <p>
+      Number of exercises{' '}
+      {parts.reduce((accum, part) => accum + part.exercises, 0)}
+    </p>
+  )
 }
 
 const Course = ({ course }) => {
