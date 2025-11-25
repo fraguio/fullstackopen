@@ -23,29 +23,59 @@ const App = () => {
 
   const addPerson = event => {
     event.preventDefault()
-    if (
-      persons.some(
-        person => person.name.toLowerCase() === newName.toLowerCase(),
+    const previousPerson = persons.find(
+      person => person.name.toLowerCase() === newName.toLowerCase(),
+    )
+    if (previousPerson) {
+      const confirmReplace = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`,
       )
-    ) {
-      alert(`${newName} is already added to phonebook`)
-      clearForm()
-      return
-    }
-    const personObject = {
-      name: newName,
-      number: newNumber,
-    }
+      if (!confirmReplace) {
+        clearForm()
+        return
+      } else {
+        personService
+          .updatePerson(previousPerson.id, {
+            ...previousPerson,
+            number: newNumber,
+          })
+          .then(updatedPerson => {
+            setPersons(
+              persons.map(person =>
+                person.id === updatedPerson.id // Mejor usar el ID
+                  ? updatedPerson
+                  : person,
+              ),
+            )
+            clearForm()
+          })
+          .catch(error => {
+            console.error('Error updating person:', error)
+          })
+      }
+    } else {
+      const personObject = {
+        name: newName,
+        number: newNumber,
+      }
 
-    personService.createPerson(personObject).then(returnedPerson => {
-      setPersons(persons.concat(returnedPerson))
-      clearForm()
-    })
+      personService
+        .createPerson(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          clearForm()
+        })
+        .catch(error => {
+          console.error('Error creating person:', error)
+        })
+    }
   }
 
   const handleDeletePerson = (id, name) => {
     const confirmDelete = window.confirm(`Delete ${name}?`)
-    if (!confirmDelete) return
+    if (!confirmDelete) {
+      return
+    }
 
     personService
       .deletePerson(id)

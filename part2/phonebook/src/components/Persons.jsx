@@ -3,7 +3,7 @@ import Person from './Person'
 const Persons = ({ personsToShow, handleDeletePerson }) =>
   personsToShow.map(person => (
     <Person
-      key={person.name}
+      key={person.id}
       person={person}
       handleDeletePerson={handleDeletePerson}
     />
