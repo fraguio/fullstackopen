@@ -1,6 +1,12 @@
 import Person from './Person'
 
-const Persons = ({ personsToShow }) =>
-  personsToShow.map(person => <Person key={person.name} person={person} />)
+const Persons = ({ personsToShow, handleDeletePerson }) =>
+  personsToShow.map(person => (
+    <Person
+      key={person.name}
+      person={person}
+      handleDeletePerson={handleDeletePerson}
+    />
+  ))
 
 export default Persons

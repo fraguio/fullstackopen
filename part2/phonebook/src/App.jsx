@@ -11,7 +11,7 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    personService.getAll().then(initialPersons => {
+    personService.getAllPersons().then(initialPersons => {
       setPersons(initialPersons)
     })
   }, [])
@@ -37,10 +37,24 @@ const App = () => {
       number: newNumber,
     }
 
-    personService.create(personObject).then(returnedPerson => {
+    personService.createPerson(personObject).then(returnedPerson => {
       setPersons(persons.concat(returnedPerson))
-      clearForm('')
+      clearForm()
     })
+  }
+
+  const handleDeletePerson = (id, name) => {
+    const confirmDelete = window.confirm(`Delete ${name}?`)
+    if (!confirmDelete) return
+
+    personService
+      .deletePerson(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+      .catch(error => {
+        console.error('Error deleting person:', error)
+      })
   }
 
   const handleFilterChange = event => {
@@ -72,7 +86,10 @@ const App = () => {
         newNumber={newNumber}
       />
       <h3>Numbers</h3>
-      <Persons personsToShow={personsToShow} />
+      <Persons
+        personsToShow={personsToShow}
+        handleDeletePerson={handleDeletePerson}
+      />
     </div>
   )
 }
