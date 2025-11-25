@@ -11,7 +11,10 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [notification, setNotification] = useState(null)
+  const [notification, setNotification] = useState({
+    type: null,
+    message: null,
+  })
 
   useEffect(() => {
     personService.getAllPersons().then(initialPersons => {
@@ -24,9 +27,34 @@ const App = () => {
     setNewNumber('')
   }
 
-  const showNotification = message => {
-    setNotification(message)
-    setTimeout(() => setNotification(null), 3000)
+  const handleError = (error, action, personId, personName) => {
+    console.error(`Error ${action} person:`, error)
+    if (error.response && error.response.status === 404) {
+      showNotification(
+        'error',
+        `Information of ${personName} has already been removed from server`,
+      )
+      if (personId) {
+        setPersons(persons.filter(person => person.id !== personId))
+      }
+    } else {
+      showNotification(
+        'error',
+        `Error ${action} ${personName}: ${error.message}`,
+      )
+    }
+  }
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message })
+    setTimeout(
+      () =>
+        setNotification({
+          type: null,
+          message: null,
+        }),
+      3000,
+    )
   }
 
   const addPerson = event => {
@@ -54,12 +82,18 @@ const App = () => {
               ),
             )
             showNotification(
-              `Updated ${updatedPerson.name} with number ${updatedPerson.number} `,
+              'success',
+              `Updated ${updatedPerson.name} with number ${updatedPerson.number}`,
             )
             clearForm()
           })
           .catch(error => {
-            console.error('Error updating person:', error)
+            handleError(
+              error,
+              'updating',
+              previousPerson.id,
+              previousPerson.name,
+            )
           })
       }
     } else {
@@ -73,12 +107,13 @@ const App = () => {
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           showNotification(
+            'success',
             `Added ${returnedPerson.name} with number ${returnedPerson.number} `,
           )
           clearForm()
         })
         .catch(error => {
-          console.error('Error creating person:', error)
+          handleError(error, 'creating', undefined, personObject.name)
         })
     }
   }
@@ -95,7 +130,7 @@ const App = () => {
         setPersons(persons.filter(person => person.id !== id))
       })
       .catch(error => {
-        console.error('Error deleting person:', error)
+        handleError(error, 'deleting', id, name)
       })
   }
 
@@ -118,7 +153,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification notification={notification} />
+      <Notification type={notification.type} message={notification.message} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h3>add a new</h3>
       <PersonForm
