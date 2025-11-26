@@ -15,6 +15,10 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleShowOnClick = country => {
+    setFilter(country.name.common)
+  }
+
   useEffect(() => {
     countriesService
       .getAll()
@@ -24,7 +28,10 @@ const App = () => {
   return (
     <div>
       <Filter value={filter} handleFilterChange={handleFilterChange} />
-      <Countries countries={filteredCountries} />
+      <Countries
+        countries={filteredCountries}
+        handleShowOnClick={handleShowOnClick}
+      />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-const Country = ({ country }) => {
+const CountryDetail = ({ country }) => {
   const languages = Object.entries(country.languages)
   return (
     <div>
@@ -7,13 +7,13 @@ const Country = ({ country }) => {
       <div>Area {country.area}</div>
       <h2>Languages</h2>
       <ul>
-        {languages.map(([code, name]) => {
-          return <li key={code}>{name}</li>
-        })}
+        {languages.map(([code, name]) => (
+          <li key={code}>{name}</li>
+        ))}
       </ul>
       <img src={country.flags.png} alt={country.flags.alt} />
     </div>
   )
 }
 
-export default Country
+export default CountryDetail
